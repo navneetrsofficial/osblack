@@ -1,0 +1,89 @@
+
+p = ["P1", "P2", "P3", "P4", "P5"]
+bt = [10, 1, 2, 1, 5]
+n = len(p)
+
+q = 3
+rt = bt.copy()
+ct = [0] * n
+gantt = []
+time = 0
+ready = list(range(n))
+
+while ready:
+    i = ready.pop(0)
+    start = time
+
+    if rt[i] > q:
+        time += q
+        rt[i] -= q
+        ready.append(i)
+    else:
+        time += rt[i]
+        rt[i] = 0
+        ct[i] = time
+
+    gantt.append((p[i], start, time))
+
+tat = ct.copy()
+wt = [tat[i] - bt[i] for i in range(n)]
+
+print("ROUND ROBIN SCHEDULING")
+print("\nProcess\tBT\tCT\tTAT\tWT")
+
+for i in range(n):
+    print(p[i], "\t", bt[i], "\t", ct[i], "\t",
+          tat[i], "\t", wt[i])
+
+print("\nGantt Chart:")
+for x in gantt:
+    print("|", x[0], end=" ")
+print("|")
+
+print(gantt[0][1], end="")
+for x in gantt:
+    print("\t", x[2], end="")
+
+print("\n\nAverage Waiting Time =", sum(wt) / n)
+print("Average Turnaround Time =", sum(tat) / n)
+
+#----------------------------------------------------
+
+p = ["P1", "P2", "P3", "P4", "P5"]
+bt = [10, 1, 2, 1, 5]
+pr = [3, 1, 4, 5, 2]
+n = len(p)
+
+order = sorted(range(n), key=lambda i: pr[i])
+
+ct = [0] * n
+gantt = []
+time = 0
+
+for i in order:
+    start = time
+    time += bt[i]
+    ct[i] = time
+    gantt.append((p[i], start, time))
+
+tat = ct.copy()
+wt = [tat[i] - bt[i] for i in range(n)]
+
+print("PRIORITY SCHEDULING")
+print("\nProcess\tBT\tPriority\tCT\tTAT\tWT")
+
+for i in range(n):
+    print(p[i], "\t", bt[i], "\t", pr[i], "\t\t",
+          ct[i], "\t", tat[i], "\t", wt[i])
+
+print("\nGantt Chart:")
+for x in gantt:
+    print("|", x[0], end=" ")
+print("|")
+
+print(gantt[0][1], end="")
+for x in gantt:
+    print("\t", x[2], end="")
+
+print("\n\nAverage Waiting Time =", sum(wt) / n)
+print("Average Turnaround Time =", sum(tat) / n)
