@@ -1,89 +1,61 @@
 
-p = ["P1", "P2", "P3", "P4", "P5"]
-bt = [10, 1, 2, 1, 5]
-n = len(p)
+# ROUND ROBIN SCHEDULING
 
+p = [["P1", 10], ["P2", 1], ["P3", 2], ["P4", 1], ["P5", 5]]
 q = 3
-rt = bt.copy()
-ct = [0] * n
-gantt = []
-time = 0
-ready = list(range(n))
+bt = {x[0]: x[1] for x in p}
+rem = bt.copy()
+ct, chart, time = {}, [], 0
 
-while ready:
-    i = ready.pop(0)
-    start = time
+while any(rem.values()):
+    for name in rem:
+        if rem[name] > 0:
+            t = min(q, rem[name])
+            chart.append(name + "(" + str(time) + "-" + str(time+t) + ")")
+            time += t
+            rem[name] -= t
+            if rem[name] == 0:
+                ct[name] = time
 
-    if rt[i] > q:
-        time += q
-        rt[i] -= q
-        ready.append(i)
-    else:
-        time += rt[i]
-        rt[i] = 0
-        ct[i] = time
+print("\nROUND ROBIN")
+print("Process", "BT", "CT", "TAT", "WT", sep="\t")
+wt, tat = [], []
 
-    gantt.append((p[i], start, time))
+for name, b in bt.items():
+    t = ct[name]
+    w = t - b
+    wt.append(w)
+    tat.append(t)
+    print(name, b, t, t, w, sep="\t")
 
-tat = ct.copy()
-wt = [tat[i] - bt[i] for i in range(n)]
+print("Average WT:", sum(wt)/5)
+print("Average TAT:", sum(tat)/5)
+print("Gantt Chart:", " | ".join(chart))
 
-print("ROUND ROBIN SCHEDULING")
-print("\nProcess\tBT\tCT\tTAT\tWT")
 
-for i in range(n):
-    print(p[i], "\t", bt[i], "\t", ct[i], "\t",
-          tat[i], "\t", wt[i])
+# -----------------------
 
-print("\nGantt Chart:")
-for x in gantt:
-    print("|", x[0], end=" ")
-print("|")
 
-print(gantt[0][1], end="")
-for x in gantt:
-    print("\t", x[2], end="")
+# PRIORITY SCHEDULING
 
-print("\n\nAverage Waiting Time =", sum(wt) / n)
-print("Average Turnaround Time =", sum(tat) / n)
+p = [["P1", 10, 3], ["P2", 1, 1], ["P3", 2, 4],
+     ["P4", 1, 5], ["P5", 5, 2]]
 
-#----------------------------------------------------
+p.sort(key=lambda x: x[2])
+time, wt, tat, chart = 0, [], [], []
 
-p = ["P1", "P2", "P3", "P4", "P5"]
-bt = [10, 1, 2, 1, 5]
-pr = [3, 1, 4, 5, 2]
-n = len(p)
+print("\nPRIORITY SCHEDULING")
+print("Process", "BT", "Priority", "CT", "TAT", "WT", sep="\t")
 
-order = sorted(range(n), key=lambda i: pr[i])
+for name, b, pr in p:
+    w = time
+    time += b
+    t = time
+    wt.append(w)
+    tat.append(t)
+    chart.append(name + "(" + str(w) + "-" + str(t) + ")")
+    print(name, b, pr, t, t, w, sep="\t")
 
-ct = [0] * n
-gantt = []
-time = 0
-
-for i in order:
-    start = time
-    time += bt[i]
-    ct[i] = time
-    gantt.append((p[i], start, time))
-
-tat = ct.copy()
-wt = [tat[i] - bt[i] for i in range(n)]
-
-print("PRIORITY SCHEDULING")
-print("\nProcess\tBT\tPriority\tCT\tTAT\tWT")
-
-for i in range(n):
-    print(p[i], "\t", bt[i], "\t", pr[i], "\t\t",
-          ct[i], "\t", tat[i], "\t", wt[i])
-
-print("\nGantt Chart:")
-for x in gantt:
-    print("|", x[0], end=" ")
-print("|")
-
-print(gantt[0][1], end="")
-for x in gantt:
-    print("\t", x[2], end="")
-
-print("\n\nAverage Waiting Time =", sum(wt) / n)
-print("Average Turnaround Time =", sum(tat) / n)
+print("Average WT:", sum(wt)/5)
+print("Average TAT:", sum(tat)/5)
+print("Gantt Chart:", " | ".join(chart))
